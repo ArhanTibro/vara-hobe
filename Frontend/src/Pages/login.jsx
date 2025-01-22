@@ -1,5 +1,4 @@
-import React from "react";
-
+//import React from "react";
 import { Link } from "react-router-dom";
 
 const LoginPage = () => {
@@ -47,8 +46,8 @@ const LoginPage = () => {
           </button>
         </div>
         <p className="text-sm text-center text-[#3F4651]">
-          Don't have an account?{" "}
-          <Link to="/signup" className="text-[#3F4651] hover:underline">
+          Don&apos;t have an account?{" "}
+          <Link to="/signUp" className="text-[#3F4651] hover:underline">
             Sign Up
           </Link>
         </p>
