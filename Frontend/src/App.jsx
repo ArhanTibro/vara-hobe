@@ -24,11 +24,7 @@ function App() {
     },
     {
       path: "/addList",
-      element: (
-        <>
-          <Navbar /> <AddList />
-        </>
-      ),
+      element: <AddList />,
     },
     {
       path: "/profile",
