@@ -3,7 +3,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LoginPage from "./Pages/login";
 import SignupPage from "./Pages/signupPage";
 import Home from "./Pages/Home";
-import Navbar from "./Components/Navbar";
 import Search from "./Pages/Search";
 import AddList from "./Pages/AddList";
 import Profile from "./Pages/Profile";
@@ -24,11 +23,7 @@ function App() {
     },
     {
       path: "/profile",
-      element: (
-        <>
-          <Navbar /> <Profile />
-        </>
-      ),
+      element: <Profile />,
     },
     {
       path: "/login",
