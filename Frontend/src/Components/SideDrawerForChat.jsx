@@ -1,8 +1,8 @@
-import React from 'react';
+//import React from 'react';
 
 const SideDrawerForChat = () => {
   return (
-    <div >
+    <div>
       <h1 className="text-align: center">Hello</h1>
     </div>
   );

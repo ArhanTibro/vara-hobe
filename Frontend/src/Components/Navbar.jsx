@@ -44,6 +44,11 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
+            <Link to="/chatPage" className="hover:text-white">
+              Messenger
+            </Link>
+          </li>
+          <li>
             <Link to="/profile" className="hover:text-white">
               Profile
             </Link>

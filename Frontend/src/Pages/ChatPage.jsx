@@ -1,14 +1,20 @@
 import SideDrawerForChat from "../Components/SideDrawerForChat";
+import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
+
+//import React from 'react'
 
 const ChatPage = () => {
-    return(
-    <div>    
-      <SideDrawerForChat/>    
-        <div>
-          
-          {/*chat*/}  
-          {/*User*/}  
-        </div>
+  return (
+    <div className="flex flex-col min-h-screen">
+      {/* Navbar */}
+      <div className="sticky top-0 z-50">
+        <Navbar />
+        <SideDrawerForChat />
+        <Footer />
+      </div>
     </div>
-    ); 
+  );
 };
+
+export default ChatPage;

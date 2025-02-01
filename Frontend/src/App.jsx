@@ -6,6 +6,7 @@ import Home from "./Pages/Home";
 import Search from "./Pages/Search";
 import AddList from "./Pages/AddList";
 import Profile from "./Pages/Profile";
+import ChatPage from "./Pages/ChatPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -22,9 +23,14 @@ function App() {
       element: <AddList />,
     },
     {
+      path: "/chatPage",
+      element: <ChatPage />,
+    },
+    {
       path: "/profile",
       element: <Profile />,
     },
+
     {
       path: "/login",
       element: <LoginPage />,
