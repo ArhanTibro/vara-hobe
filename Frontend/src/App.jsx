@@ -1,7 +1,10 @@
+import ChatPage from "./Pages/ChatPage";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
 function App() {
   return (
     <>
-      <h1 className="text-6xl text-orange-500 text-center">Hello Project !</h1>
+      <RouterProvider router={router} />
     </>
   );
 }
