@@ -10,9 +10,9 @@ const ChatPage = () => {
       {/* Navbar */}
       <div className="sticky top-0 z-50">
         <Navbar />
-        <SideDrawerForChat />
-        <Footer />
       </div>
+      <SideDrawerForChat />
+      <Footer />
     </div>
   );
 };
