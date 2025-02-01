@@ -16,11 +16,7 @@ function App() {
     },
     {
       path: "/search",
-      element: (
-        <>
-          <Navbar /> <Search />
-        </>
-      ),
+      element: <Search />,
     },
     {
       path: "/addList",
