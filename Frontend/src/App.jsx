@@ -3,10 +3,10 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LoginPage from "./Pages/login";
 import SignupPage from "./Pages/signupPage";
 import Home from "./Pages/Home";
-import Navbar from "./Components/Navbar";
 import Search from "./Pages/Search";
 import AddList from "./Pages/AddList";
 import Profile from "./Pages/Profile";
+import ChatPage from "./Pages/ChatPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -16,28 +16,21 @@ function App() {
     },
     {
       path: "/search",
-      element: (
-        <>
-          <Navbar /> <Search />
-        </>
-      ),
+      element: <Search />,
     },
     {
       path: "/addList",
-      element: (
-        <>
-          <Navbar /> <AddList />
-        </>
-      ),
+      element: <AddList />,
+    },
+    {
+      path: "/chatPage",
+      element: <ChatPage />,
     },
     {
       path: "/profile",
-      element: (
-        <>
-          <Navbar /> <Profile />
-        </>
-      ),
+      element: <Profile />,
     },
+
     {
       path: "/login",
       element: <LoginPage />,
