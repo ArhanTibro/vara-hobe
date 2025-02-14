@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 
 const AddList = () => {
@@ -34,11 +33,6 @@ const AddList = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-[#3F4651]">
-      {/* Navbar */}
-      <div className="sticky top-0 z-50 bg-[#3F4651]">
-        <Navbar />
-      </div>
-
       {/* Form Section */}
       <div className="flex-grow container mx-auto px-4 py-8">
         <h2 className="text-2xl font-semibold mb-4">Add Property Listing</h2>
