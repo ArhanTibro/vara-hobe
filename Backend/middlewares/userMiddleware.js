@@ -1,4 +1,5 @@
 // middlewares/userMiddleware.js
+import jwt from 'jsonwebtoken';
 
 export const validateSignup = (req, res, next) => {
   const { fullName, username, email, password, confirmPassword, phoneNumber, presentAddress } = req.body;
@@ -22,4 +23,24 @@ export const validateLogin = (req, res, next) => {
   }
 
   next();  // Move to the next function (controller)
+};
+
+
+export const authenticateUser = (req, res, next) => {
+  const token = req.header('Authorization')?.replace('Bearer ', '');
+  console.log('Extracted Token:', token);  // Debugging token
+
+  if (!token) {
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    console.log('Decoded Token:', decoded);  // Debugging decoded token
+    next();
+  } catch (error) {
+    console.error('JWT Verification Error:', error);
+    return res.status(401).json({ message: 'Invalid or expired token' });
+  }
 };

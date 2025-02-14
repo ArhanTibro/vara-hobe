@@ -8,3 +8,5 @@ userRouter.post('/signup', validateSignup, signupUser);
 userRouter.post('/login', validateLogin, loginUser);
 
 export default userRouter;
+
+
