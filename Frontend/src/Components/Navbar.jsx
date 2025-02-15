@@ -58,12 +58,12 @@ const Navbar = () => {
         {/* Buttons Section (Desktop) */}
         <div className="hidden sm:flex space-x-4">
           <Link to="/login">
-            <button className="bg-[#C0BCB5] text-[#3F4651] px-4 py-2 rounded hover:bg-white">
+            <button className="bg-[#C0BCB5] text-[#3F4651] px-4 py-2 rounded-full hover:bg-white transition duration-300">
               Login
             </button>
           </Link>
           <Link to="/signUp">
-            <button className="bg-[#EBECED] text-[#3F4651] px-4 py-2 rounded hover:bg-white">
+            <button className="bg-[#EBECED] text-[#3F4651] px-4 py-2 rounded-full hover:bg-white">
               Sign Up
             </button>
           </Link>
