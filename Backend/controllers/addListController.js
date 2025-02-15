@@ -12,6 +12,7 @@ export const addListing = async (req, res) => {
       title,
       type,
       roomCount,
+      size,
       description,
       location,
       image: imagePath, // Store file path

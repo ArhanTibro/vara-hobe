@@ -10,7 +10,7 @@ import LoginPage from "./Pages/login";
 import SignupPage from "./Pages/signupPage";
 import Home from "./Pages/Home";
 import Search from "./Pages/Search";
-import AddList from "./Pages/AddList";
+import AddListU from "./Pages/AddListU";
 import Profile from "./Pages/Profile";
 import ChatPage from "./Pages/ChatPage";
 import Navbar from "./Components/Navbar";
@@ -53,7 +53,7 @@ function App() {
           <Route path="/search" element={<Search />} />
           <Route
             path="/addList"
-            element={isLoggedIn ? <AddList /> : <Navigate to="/login" />}
+            element={isLoggedIn ? <AddListU /> : <Navigate to="/login" />}
           />
           <Route
             path="/chatPage"
