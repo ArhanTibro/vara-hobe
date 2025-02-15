@@ -3,6 +3,10 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 
+
+
+
+
 // Ensure uploads directory exists
 const uploadDir = path.join("public/uploads");
 if (!fs.existsSync(uploadDir)) {
@@ -18,12 +22,13 @@ const storage = multer.diskStorage({
   }
 });
 
-export const upload = multer({ storage }).single('image');
+export const upload = multer({ storage }).array('image', 5);
+
 
 export const validateListing = (req, res, next) => {
-  const { title, type, roomCount, description, location } = req.body;
+  const { title, type, roomCount, description, location, size } = req.body;
 
-  if (!title || !type || !roomCount || !description || !location) {
+  if (!title || !type || !roomCount || !description || !location || !size) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
@@ -33,4 +38,3 @@ export const validateListing = (req, res, next) => {
 
   next();
 };
-
