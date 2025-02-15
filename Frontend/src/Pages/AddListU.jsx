@@ -2,35 +2,43 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../Components/Footer";
 import { useFormik } from "formik";
+import { AddListSchema } from "../../../Backend/models/AddList";
 
-const AddList = () => {
+const onSubmit = () => {
+  console.log("Submitted");
+};
+
+const AddListU = () => {
   const navigate = useNavigate();
-  const { values, handleBlur, handleChange = useFormik}({
-    images: null,
-    phone1: "",
-    phone2: "",
-    address: "",
-    area: "",
-    rooms: "",
-    washrooms: "",
-    size: "",
-    description: "",
-    rent: "",
+  const { values, errors, handleBlur, handleSubmit } = useFormik({
+    initialValues: {
+      title: "",
+      type: "",
+      size: "",
+      bedroom: "",
+      washroom: "",
+      balcony: "",
+      description: "",
+      location: "",
+      images: null,
+    },
+    validationSchema: AddListSchema,
+    onSubmit,
   });
 
-//  const handleChange = (e) => {
-//   const { name, value, type, files } = e.target;
-//   setFormData({
-//      ...formData,
-//      [name]: type === "file" ? files : value,
-//   });
-//  };
+  //const { name, value, type, files } = e.target;
+  //const handleChange = (e) => {
+  //  setFormData({
+  //    ...formData,
+  //    [name]: type === "file" ? files : value,
+  //  });
+  //};
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form submitted", formData);
-    navigate("/"); // Redirect after submission
-  };
+  //const handleSubmit = (e) => {
+  //  e.preventDefault();
+  //  console.log("Form submitted", formData);
+  //  navigate("/"); // Redirect after submission
+  //};
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-[#3F4651]">
@@ -48,131 +56,139 @@ const AddList = () => {
               name="images"
               multiple
               onChange={handleChange}
-              className="border p-2 w-full bg-white"
+              className="border p-2 w-full bg-[#EBECED]"
+              onBlur={handleBlur}
+            />
+          </div>
+          {/* title */}
+          <div>
+            <label className="block font-medium">Title</label>
+            <input
+              type="text"
+              name="title"
+              value={values.title}
+              onChange={handleChange}
+              className={`border p-2 w-full bg-white ${
+                errors.title && touched.title ? "input-error" : ""
+              }`}
+              onBlur={handleBlur}
+              required
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* type */}
+
+          <div>
+            <label className="block font-medium">Property Type</label>
+            <select
+              name="type"
+              value={values.type}
+              onChange={handleChange}
+              className={`border p-2 w-full bg-white ${
+                errors.type && touched.type ? "input-error" : ""
+              }`}
+              onBlur={handleBlur}
+            >
+              <option value="">Select Area</option>
+              <option value="Residential">Residential</option>
+              <option value="Office">Office</option>
+              <option value="Warehouse">Warehouse</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block font-medium">Phone Number 1</label>
+              <label className="block font-medium">Bedroom</label>
               <input
                 type="text"
-                name="phone1"
-                value={formData.phone1}
+                name="bedroom"
+                value={values.bedroom}
                 onChange={handleChange}
-                className="border p-2 w-full bg-white"
+                className={`border p-2 w-full bg-white ${
+                  errors.bedroom && touched.bedroom ? "input-error" : ""
+                }`}
+                onBlur={handleBlur}
                 required
               />
             </div>
             <div>
-              <label className="block font-medium">
-                Phone Number 2 (Optional)
-              </label>
+              <label className="block font-medium">Washroom</label>
               <input
                 type="text"
-                name="phone2"
-                value={formData.phone2}
+                name="washroom"
+                value={values.washroom}
                 onChange={handleChange}
-                className="border p-2 w-full bg-white"
+                className={`border p-2 w-full bg-white ${
+                  errors.washroom && touched.washroom ? "input-error" : ""
+                }`}
+                onBlur={handleBlur}
+                required
+              />
+            </div>
+            <div>
+              <label className="block font-medium">Balcony</label>
+              <input
+                type="text"
+                name="balcony"
+                value={values.balcony}
+                onChange={handleChange}
+                className={`border p-2 w-full bg-white ${
+                  errors.balcony && touched.balcony ? "input-error" : ""
+                }`}
+                onBlur={handleBlur}
+                required
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block font-medium">Address</label>
-              <input
-                type="text"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                className="border p-2 w-full bg-white"
-                required
-              />
-            </div>
-            <div>
-              <label className="block font-medium">Area</label>
-              <select
-                name="area"
-                value={formData.area}
-                onChange={handleChange}
-                className="border p-2 w-full bg-white"
-              >
-                <option value="">Select Area</option>
-                <option value="Dhanmondi">Dhanmondi</option>
-                <option value="Gulshan">Gulshan</option>
-                <option value="Banani">Banani</option>
-                <option value="Mirpur">Mirpur</option>
-                <option value="Uttara">Uttara</option>
-                <option value="Bashundhara">Bashundhara</option>
-                <option value="Mohammadpur">Mohammadpur</option>
-                <option value="Banasree">Banasree</option>
-                <option value="Motijheel">Motijheel</option>
-                <option value="Shyamoli">Shyamoli</option>
-              </select>
-            </div>
+          {/* size */}
+
+          <div>
+            <label className="block font-medium">Size</label>
+            <input
+              type="text"
+              name="size"
+              value={values.size}
+              onChange={handleChange}
+              className={`border p-2 w-full bg-white ${
+                errors.size && touched.size ? "input-error" : ""
+              }`}
+              onBlur={handleBlur}
+              required
+            />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block font-medium">Number of Rooms</label>
-              <input
-                type="number"
-                name="rooms"
-                value={formData.rooms}
-                onChange={handleChange}
-                className="border p-2 w-full bg-white"
-                required
-              />
-            </div>
+          {/* Address */}
 
-            <div>
-              <label className="block font-medium">
-                Number of Washrooms (Optional)
-              </label>
-              <input
-                type="number"
-                name="washrooms"
-                value={formData.washrooms}
-                onChange={handleChange}
-                className="border p-2 w-full bg-white"
-              />
-            </div>
-
-            <div>
-              <label className="block font-medium">Size (sq ft)</label>
-              <input
-                type="number"
-                name="size"
-                value={formData.size}
-                onChange={handleChange}
-                className="border p-2 w-full bg-white"
-                required
-              />
-            </div>
+          <div>
+            <label className="block font-medium">Address</label>
+            <input
+              type="text"
+              name="address"
+              value={values.address}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className={`border p-2 w-full bg-white ${
+                errors.address && touched.address ? "input-error" : ""
+              }`}
+              required
+            />
           </div>
+
+          {/* Description */}
 
           <div>
             <label className="block font-medium">Description</label>
             <textarea
               name="description"
-              value={formData.description}
+              value={values.description}
               onChange={handleChange}
-              className="border p-2 w-full bg-white"
+              onBlur={handleBlur}
+              className={`border p-2 w-full bg-white ${
+                errors.description && touched.description ? "input-error" : ""
+              }`}
               required
             ></textarea>
-          </div>
-
-          <div>
-            <label className="block font-medium">Rent Amount</label>
-            <input
-              type="number"
-              name="rent"
-              value={formData.rent}
-              onChange={handleChange}
-              className="border p-2 w-full bg-white"
-              required
-            />
           </div>
 
           <div className="flex justify-center">
@@ -192,4 +208,4 @@ const AddList = () => {
   );
 };
 
-export default AddList;
+export default AddListU;

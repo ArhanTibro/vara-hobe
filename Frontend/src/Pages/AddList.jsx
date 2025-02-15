@@ -47,7 +47,7 @@ const AddList = () => {
               name="images"
               multiple
               onChange={handleChange}
-              className="border p-2 w-full bg-white"
+              className="p-2 w-full bg-[#EBECED] rounded-md"
             />
           </div>
 
