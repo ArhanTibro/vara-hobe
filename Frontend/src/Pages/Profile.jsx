@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Footer from "../Components/Footer";
-import Navbar from "../Components/Navbar";
 import List from "../Components/List";
 
 const ProfilePage = () => {
@@ -12,9 +11,6 @@ const ProfilePage = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Navbar */}
-      <Navbar />
-
       {/* Profile Section */}
       <div className="min-h-screen bg-[#EBECED] flex flex-col items-center p-6">
         <div className="w-full max-w-4xl bg-white shadow-lg rounded-2xl p-6">
