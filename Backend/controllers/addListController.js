@@ -1,12 +1,44 @@
 import List from "../models/AddList.js";
-import path from "path";
-import fs from "fs";
+import cloudinary from "cloudinary";
+import dotenv from "dotenv";
 
+dotenv.config();
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Upload images to Cloudinary
+const uploadToCloudinary = (buffer, filename) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.v2.uploader.upload_stream(
+      { resource_type: "image", folder: "vara-hobe" },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result.secure_url);
+      }
+    );
+    uploadStream.end(buffer);
+  });
+};
+
+// 🏡 Add New Listing
 export const addListing = async (req, res) => {
   const { title, type, roomCount, size, description, location } = req.body;
-  const imagePaths = req.files ? req.files.map((file) => `/uploads/${file.filename}`) : [];
-
+  
   try {
+    let imagePaths = [];
+    
+    if (req.files && req.files.length > 0) {
+      // Upload images to Cloudinary
+      imagePaths = await Promise.all(
+        req.files.map((file) => uploadToCloudinary(file.buffer, file.originalname))
+      );
+    }
+
     const newListing = new List({
       title,
       type,
@@ -14,7 +46,7 @@ export const addListing = async (req, res) => {
       size,
       description,
       location,
-      image: imagePaths, // Store array of file paths
+      image: imagePaths, // Store Cloudinary URLs
       seller: req.user.id,
     });
 
@@ -26,6 +58,7 @@ export const addListing = async (req, res) => {
   }
 };
 
+// 📃 Get All Listings
 export const getAllListings = async (req, res) => {
   try {
     const listings = await List.find().populate("seller", "fullName phoneNumber presentAddress");
@@ -36,6 +69,7 @@ export const getAllListings = async (req, res) => {
   }
 };
 
+// 🔍 Get Single Listing
 export const getListingById = async (req, res) => {
   try {
     const listing = await List.findById(req.params.id).populate("seller", "fullName phoneNumber presentAddress");
@@ -47,26 +81,33 @@ export const getListingById = async (req, res) => {
   }
 };
 
+// ✏️ Update Listing
 export const updateListing = async (req, res) => {
   try {
     const listing = await List.findById(req.params.id);
     if (!listing) return res.status(404).json({ message: "Listing not found" });
 
-    if (req.files) {
-      // ✅ Delete old images before updating
-      if (listing.image && listing.image.length > 0) {
-        listing.image.forEach((oldImage) => {
-          const oldImagePath = path.join("public", oldImage);
-          if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath);
-        });
-      }
+    let newImagePaths = listing.image; // Keep old images if no new images uploaded
 
-      // ✅ Save new images
-      listing.image = req.files.map((file) => `/uploads/${file.filename}`);
+    if (req.files && req.files.length > 0) {
+      // 🗑️ Delete old images from Cloudinary
+      await Promise.all(
+        listing.image.map(async (url) => {
+          const publicId = url.split("/").pop().split(".")[0];
+          await cloudinary.v2.uploader.destroy(`vara-hobe/${publicId}`);
+        })
+      );
+
+      // 🚀 Upload new images to Cloudinary
+      newImagePaths = await Promise.all(
+        req.files.map((file) => uploadToCloudinary(file.buffer, file.originalname))
+      );
     }
 
-    // ✅ Update other fields
+    // ✅ Update listing details
     Object.assign(listing, req.body);
+    listing.image = newImagePaths;
+    
     await listing.save();
     res.status(200).json({ message: "Listing updated", listing });
   } catch (error) {
@@ -75,18 +116,19 @@ export const updateListing = async (req, res) => {
   }
 };
 
+// 🗑️ Delete Listing
 export const deleteListing = async (req, res) => {
   try {
     const listing = await List.findById(req.params.id);
     if (!listing) return res.status(404).json({ message: "Listing not found" });
 
-    // ✅ Corrected Image Deletion Logic
-    if (listing.image && listing.image.length > 0) {
-      listing.image.forEach((img) => {
-        const imagePath = path.join("public", img);
-        if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
-      });
-    }
+    // 🗑️ Delete images from Cloudinary
+    await Promise.all(
+      listing.image.map(async (url) => {
+        const publicId = url.split("/").pop().split(".")[0];
+        await cloudinary.v2.uploader.destroy(`vara-hobe/${publicId}`);
+      })
+    );
 
     await List.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: "Listing deleted" });
