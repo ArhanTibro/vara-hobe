@@ -1,5 +1,3 @@
-// models/User.js
-
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
@@ -38,6 +36,15 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Present Address is required'],
     trim: true
+  },
+  rating: {
+    type: Number,
+    default: 0
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
   }
 }, {
   timestamps: true
