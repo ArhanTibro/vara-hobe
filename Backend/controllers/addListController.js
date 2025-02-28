@@ -27,11 +27,11 @@ const uploadToCloudinary = (buffer, filename) => {
 
 // 🏡 Add New Listing
 export const addListing = async (req, res) => {
-  const { title, type, roomCount, size, description, location } = req.body;
-  
+  const { title, type, roomCount, size, description, location, area, public: isPublic } = req.body;
+
   try {
     let imagePaths = [];
-    
+
     if (req.files && req.files.length > 0) {
       // Upload images to Cloudinary
       imagePaths = await Promise.all(
@@ -46,6 +46,8 @@ export const addListing = async (req, res) => {
       size,
       description,
       location,
+      area, // ✅ Store area
+      public: isPublic !== undefined ? JSON.parse(isPublic) : true, // ✅ Store public as boolean (default true)
       image: imagePaths, // Store Cloudinary URLs
       seller: req.user.id,
     });
@@ -106,8 +108,11 @@ export const updateListing = async (req, res) => {
 
     // ✅ Update listing details
     Object.assign(listing, req.body);
+    if (req.body.public !== undefined) {
+      listing.public = JSON.parse(req.body.public); // ✅ Ensure public is stored as a boolean
+    }
     listing.image = newImagePaths;
-    
+
     await listing.save();
     res.status(200).json({ message: "Listing updated", listing });
   } catch (error) {
