@@ -21,6 +21,17 @@ const port = process.env.PORT;
 
 app.use("/api", rootRouter);
 
+const allowedOrigins = [
+  "http://localhost:5173", // Frontend running locally
+  "http://localhost:4000", // Backend running locally
+  "https://www.vara-hobe.com", // Your live domain (SSLCommerz domain)
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
+
 
 app.listen(port, () => {
     connectDB();
