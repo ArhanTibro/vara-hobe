@@ -1,37 +1,26 @@
 import express from "express";
 import dotenv from "dotenv";
-import cors from "cors";  // Import cors
+import cors from "cors";  
 import { connectDB } from "./config/db.js";
 import rootRouter from "./routes/root.js";
-
 
 dotenv.config();
 
 const app = express();
 
-
-app.use(cors());
-
-
-
-app.use(express.json());
-
-const port = process.env.PORT;
-
-
-app.use("/api", rootRouter);
-
-const allowedOrigins = [
-  "http://localhost:5173", // Frontend running locally
-  "http://localhost:4000", // Backend running locally
-  "https://www.vara-hobe.com", // Your live domain (SSLCommerz domain)
-];
+// Use the single ALLOWED_ORIGIN value from .env
+const allowedOrigin = process.env.ALLOWED_ORIGIN || "http://localhost:5173";
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: allowedOrigin,
   credentials: true,
 }));
 
+app.use(express.json());
+
+const port = process.env.PORT || 4000;
+
+app.use("/api", rootRouter);
 
 app.listen(port, () => {
     connectDB();
