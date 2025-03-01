@@ -57,7 +57,7 @@ const AddListU = () => {
       try {
         const token = localStorage.getItem("accessToken");
 
-        await axios.post("http://localhost:4000/api/listings", formData, {
+        await axios.post("http://localhost:4000/api/list/", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
