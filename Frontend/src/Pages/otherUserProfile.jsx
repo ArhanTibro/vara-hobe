@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Footer from "../Components/Footer";
 import List from "../Components/List";
 import axios from "axios";
@@ -11,7 +11,7 @@ const OtherUserProfile = () => {
   const [rating, setRating] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOtherUserProfile = async () => {
