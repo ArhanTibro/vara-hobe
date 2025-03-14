@@ -1,192 +1,298 @@
-import { useParams } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-import Footer from "../Components/Footer";
-import Navbar from "../Components/Navbar";
-
-import img1 from "../assets/img1.jpg";
-import img2 from "../assets/img2.jpg";
-import img3 from "../assets/img3.jpg";
-import img4 from "../assets/img4.jpg";
-import img5 from "../assets/img5.jpg";
-
-const properties = [
-  {
-    id: "1",
-    images: [img1, img2],
-    title: "Luxurious 4-bedroom Apartment",
-    type: "Apartment",
-    address: "456 Park Ave, Gulshan",
-    rooms: 4,
-    washrooms: 3,
-    size: 2000,
-    rent: 40000,
-    features: ["24/7 Security", "Swimming Pool", "Gym", "Parking"],
-    description:
-      "This luxurious apartment offers modern amenities, spacious rooms, and top-tier security in a prime location.",
-    seller: {
-      name: "John Doe",
-      phone: "01711223344",
-      email: "john@example.com",
-      description:
-        "Experienced real estate agent with 10+ years in the industry.",
-    },
-  },
-  {
-    id: "2",
-    images: [img3, img2],
-    title: "Spacious 3-bedroom Apartment",
-    type: "Apartment",
-    address: "123 Main St, Dhanmondi",
-    rooms: 3,
-    washrooms: 2,
-    size: 1500,
-    rent: 25000,
-    features: ["Balcony", "Garden", "Modern Kitchen"],
-    description:
-      "A beautiful 3-bedroom apartment with a modern kitchen and a large balcony for relaxing evenings.",
-    seller: {
-      name: "Sarah Khan",
-      phone: "0123456789",
-      email: "sarah@example.com",
-      description: "Helping families find their dream homes for over 5 years.",
-    },
-  },
-
-  {
-    id: "3",
-    images: [img4, img5],
-    title: "Spacious 3-bedroom Apartment",
-    type: "Apartment",
-    address: "123 Main St, Dhanmondi",
-    rooms: 3,
-    washrooms: 2,
-    size: 1500,
-    rent: 25000,
-    features: ["Balcony", "Garden", "Modern Kitchen"],
-    description:
-      "A beautiful 3-bedroom apartment with a modern kitchen and a large balcony for relaxing evenings.",
-    seller: {
-      name: "Shakil Khan",
-      phone: "0123456789",
-      email: "sarah@example.com",
-      description: "Helping families find their dream homes for over 5 years.",
-    },
-  },
-];
-
 const PropertyDetail = () => {
-  const { id } = useParams();
-  const [property, setProperty] = useState(null);
+  const { id } = useParams(); // Get the listing ID from the URL
+  const [listing, setListing] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
 
+  // Fetch property details
   useEffect(() => {
-    const foundProperty = properties.find((prop) => prop.id === id);
-    setProperty(foundProperty);
+    const fetchListing = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        setError("You need to be logged in to view this listing.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/api/list/${id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setListing(response.data);
+        // eslint-disable-next-line no-unused-vars
+      } catch (_) {
+        setError("Failed to fetch listing details. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchListing();
   }, [id]);
 
-  if (!property) {
-    return <p className="text-center text-gray-500">Property not found.</p>;
-  }
+  // Search users by username
+  const handleSearch = async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token || !searchQuery.trim()) return;
 
-  const sliderSettings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: true,
+    try {
+      const response = await axios.get(
+        `http://localhost:4000/api/user/search?username=${searchQuery}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setSearchResults(response.data);
+      // eslint-disable-next-line no-unused-vars
+    } catch (_) {
+      setSearchResults([]);
+      setError("Failed to search users. Please try again.");
+    }
   };
 
+  // Give access to a user
+  const handleGiveAccess = async () => {
+    if (!selectedUser) {
+      alert("Please select a user to give access.");
+      return;
+    }
+
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    try {
+      await axios.patch(
+        `http://localhost:4000/api/list/${id}/access`,
+        { userId: selectedUser._id },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alert("Access granted successfully!");
+      setListing((prev) => ({ ...prev, access: selectedUser._id }));
+      setSelectedUser(null);
+      // eslint-disable-next-line no-unused-vars
+    } catch (_) {
+      alert("Failed to grant access.");
+    }
+  };
+
+  // Handle payment initiation
+  const handlePayment = async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    try {
+      const response = await axios.post(
+        `http://localhost:4000/api/list/${id}/purchase`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log("Payment Response:", response.data); // Debugging output
+
+      if (response.data.paymentUrl) {
+        window.location.href = response.data.paymentUrl; // Redirect to payment gateway
+      } else {
+        alert("Failed to retrieve payment URL.");
+      }
+    } catch (error) {
+      console.error("Payment initiation error:", error);
+      alert("Failed to initiate payment. Please try again.");
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-center text-gray-600 animate-pulse">Loading...</p>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-center text-red-500">{error}</p>
+      </div>
+    );
+
+  if (!listing)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-center text-gray-600">No listing found.</p>
+      </div>
+    );
+
+  const loggedInUserId = localStorage.getItem("userId");
+  const isOwner = listing.seller?._id === loggedInUserId;
+  const hasAccess = listing.access === loggedInUserId;
+
+  // Debugging: Log seller and user IDs
+  console.log("Seller ID:", listing.seller?._id);
+  console.log("Logged-in User ID:", loggedInUserId);
+  console.log("Is Owner:", isOwner);
+  console.log("Has Access:", hasAccess);
+
   return (
-    <>
-      <div className="container mx-auto p-4 text-[#3F4651]">
-        {/* Image Slider & Features Section */}
-        <div className="bg-[#EBECED] p-6 rounded-lg shadow-lg grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Image Slider */}
-          <div className="w-full max-w-md md:max-w-lg mx-auto">
-            <Slider {...sliderSettings} className="rounded-lg overflow-hidden">
-              {property.images.map((image, i) => (
-                <div key={i}>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold text-center mb-8 text-blue-600">
+        {listing.title}
+      </h1>
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Left: Image Carousel or Single Image */}
+        <div className="w-full md:w-1/2">
+          {listing.image?.length > 1 ? (
+            <Slider
+              dots={true}
+              infinite={true}
+              speed={500}
+              slidesToShow={1}
+              slidesToScroll={1}
+              autoplay={true}
+              autoplaySpeed={3000}
+              arrows={true}
+            >
+              {listing.image.map((img, index) => (
+                <div key={index}>
                   <img
-                    src={image}
-                    alt={`Property ${i + 1}`}
-                    className="w-full h-48 md:h-64 lg:h-80 object-cover rounded-lg"
+                    src={img}
+                    alt={`${listing.title} - Image ${index + 1}`}
+                    className="w-full h-96 object-cover"
                   />
                 </div>
               ))}
             </Slider>
-          </div>
-
-          {/* Features Section */}
-          <div className="bg-[#C0BCB5] p-4 rounded-md shadow-md flex flex-col items-center">
-            <h3 className="text-3xl p-4 font-bold mb-3 text-center">
-              Key Features
-            </h3>
-            <ul className="list-disc pl-5 text-center md:text-left">
-              {property.features.map((feature, index) => (
-                <li key={index} className="text-gray-700">
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
+          ) : (
+            <img
+              src={listing.image?.[0]}
+              alt={listing.title}
+              className="w-full h-96 object-cover"
+            />
+          )}
         </div>
 
-        {/* Property Details */}
-        <div className="mt-6 bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition duration-300">
-          <h1 className="text-3xl font-bold mb-4 text-center">
+        {/* Right: Property Details */}
+        <div className="w-full md:w-1/2 p-6">
+          <h2 className="text-2xl font-semibold mb-4 text-gray-800">
             Property Details
-          </h1>
-          <h2 className="text-xl font-semibold mb-2">
-            <strong>Address: </strong> {property.address}
           </h2>
-          <p className="text-lg text-gray-600 mb-4">
-            <strong>Description: </strong>
-            {property.description}
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4 text-gray-700">
             <p>
-              <strong>Rooms: </strong> {property.rooms}
+              <strong>Type:</strong> {listing.type}
             </p>
             <p>
-              <strong>Washrooms: </strong> {property.washrooms}
+              <strong>Location:</strong> {listing.location}
             </p>
             <p>
-              <strong>Size: </strong> {property.size} sq ft
+              <strong>Area:</strong> {listing.area}
             </p>
             <p>
-              <strong>Rent: </strong> ${property.rent}
+              <strong>Bedrooms:</strong> {listing.roomCount?.bedroom}
+            </p>
+            <p>
+              <strong>Washrooms:</strong> {listing.roomCount?.washroom}
+            </p>
+            <p>
+              <strong>Balconies:</strong> {listing.roomCount?.balcony}
+            </p>
+            <p>
+              <strong>Size:</strong> {listing.size} sqft
+            </p>
+            <p>
+              <strong>Rent:</strong> ৳{listing.rent} / month
+            </p>
+            <p>
+              <strong>Description:</strong> {listing.description}
+            </p>
+            <p>
+              <strong>Seller:</strong> {listing.seller?.fullName}
             </p>
           </div>
-        </div>
 
-        {/* Seller Information */}
-        <div className="mt-6 p-4 bg-[#C0BCB5] rounded-lg shadow-md flex flex-col md:flex-row gap-4 items-center">
-          <img
-            src="https://media.istockphoto.com/id/1327592449/vector/default-avatar-photo-placeholder-icon-grey-profile-picture-business-man.jpg?s=612x612&w=0&k=20&c=yqoos7g9jmufJhfkbQsk-mdhKEsih6Di4WZ66t_ib7I="
-            alt="Seller"
-            className="w-24 h-24 rounded-full object-cover border-2 border-[#3F4651]"
-          />
-          <div className="flex-1 text-center md:text-left">
-            <h3 className="text-xl font-semibold">{property.seller.name}</h3>
-            <p className="text-gray-700">{property.seller.description}</p>
-            <p>
-              <strong>Contact:</strong> {property.seller.phone}
-            </p>
-            <Link to="/chatPage">
-              <button className="mt-3 bg-[#3F4651] text-white px-4 py-2 rounded-lg hover:bg-[#2C3138] transition">
-                Message Seller
+          {/* Give Access Section (Only for Owner) */}
+          {isOwner && (
+            <div className="mt-8">
+              <h3 className="text-xl font-semibold mb-4 text-gray-800">
+                Give Access
+              </h3>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Search user by username"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                />
+                <button
+                  onClick={handleSearch}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                >
+                  Search
+                </button>
+              </div>
+
+              {/* Display Search Results */}
+              {searchResults.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-lg font-semibold mb-2">Search Results</h4>
+                  <ul className="space-y-2">
+                    {searchResults.map((user) => (
+                      <li
+                        key={user._id}
+                        className="flex justify-between items-center p-2 border border-gray-200 rounded-lg"
+                      >
+                        <span>{user.username}</span>
+                        <button
+                          onClick={() => setSelectedUser(user)}
+                          className="bg-green-500 text-white px-3 py-1 rounded-lg hover:bg-green-600"
+                        >
+                          Select
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Give Access Button */}
+              {selectedUser && (
+                <button
+                  onClick={handleGiveAccess}
+                  className="mt-4 bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+                >
+                  Give Access to {selectedUser.username}
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Pay Button (Only for Users with Access) */}
+          {!isOwner && hasAccess && (
+            <div className="mt-8">
+              <button
+                onClick={handlePayment}
+                className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600"
+              >
+                Pay ৳{listing.rent} / month
               </button>
-            </Link>
-          </div>
+            </div>
+          )}
         </div>
       </div>
-      <Footer />
-    </>
+    </div>
   );
 };
 

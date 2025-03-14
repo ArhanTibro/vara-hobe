@@ -9,6 +9,7 @@ const AddListingForm = () => {
     washroom: 0,
     balcony: 0,
     size: "",
+    rent: "", // ✅ Add rent field
     description: "",
     location: "",
     area: "Dhanmondi",
@@ -100,30 +101,50 @@ const AddListingForm = () => {
           <option value="Warehouse">Warehouse</option>
         </select>
 
+        {/* Room Count Section with Labels Instead of Placeholders */}
         <div className="flex gap-4">
+          <div className="flex flex-col">
+            <label className="font-semibold text-gray-700">Bedrooms</label>
+            <input
+              type="number"
+              name="bedroom"
+              value={formData.bedroom}
+              onChange={handleChange}
+              className="p-3 border rounded-lg"
+              required
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="font-semibold text-gray-700">Washrooms</label>
+            <input
+              type="number"
+              name="washroom"
+              value={formData.washroom}
+              onChange={handleChange}
+              className="p-3 border rounded-lg"
+              required
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="font-semibold text-gray-700">Balconies</label>
+            <input
+              type="number"
+              name="balcony"
+              value={formData.balcony}
+              onChange={handleChange}
+              className="p-3 border rounded-lg"
+              required
+            />
+          </div>
+        </div>
+
+        {/* ✅ Rent Field */}
+        <div className="flex flex-col">
+          <label className="font-semibold text-gray-700">Rent (BDT)</label>
           <input
             type="number"
-            name="bedroom"
-            placeholder="Bedrooms"
-            value={formData.bedroom}
-            onChange={handleChange}
-            className="p-3 border rounded-lg"
-            required
-          />
-          <input
-            type="number"
-            name="washroom"
-            placeholder="Washrooms"
-            value={formData.washroom}
-            onChange={handleChange}
-            className="p-3 border rounded-lg"
-            required
-          />
-          <input
-            type="number"
-            name="balcony"
-            placeholder="Balconies"
-            value={formData.balcony}
+            name="rent"
+            value={formData.rent}
             onChange={handleChange}
             className="p-3 border rounded-lg"
             required

@@ -10,6 +10,7 @@ const AddListSchema = new mongoose.Schema(
       balcony: { type: Number, required: true, min: [0, "Invalid number"] },
     },
     size: { type: Number, required: true },
+    rent: { type: Number, required: true }, // New rent field added
     description: {
       type: String,
       required: true,
@@ -38,7 +39,7 @@ const AddListSchema = new mongoose.Schema(
     seller: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     likes: { type: Number, default: 0 },
     occupied: { type: Boolean, default: false },
-    public: { type: Boolean, default: true }, // New Field Added
+    access: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null }, // New access field added
   },
   { timestamps: true }
 );

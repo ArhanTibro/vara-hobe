@@ -26,8 +26,9 @@ const LoginPage = () => {
         throw new Error(data.message || "Login failed");
       }
 
-      // Store only the access token
+      // Store access token and user ID
       localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("userId", data.user.id); // Store user ID
 
       alert("Login Successful");
       navigate("/"); // Redirect to homepage

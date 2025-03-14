@@ -1,16 +1,14 @@
 import express from "express";
-import { signupUser, loginUser } from "../controllers/userController.js";
-import {
-  validateSignup,
-  validateLogin,
-} from "../middlewares/userMiddleware.js";
-import { protect } from "../middlewares/authMiddleware.js"; // Authentication middleware
-import { getUserProfile } from "../controllers/profileController.js";
+import { signupUser, loginUser, searchUsers } from "../controllers/userController.js"; // Import searchUsers
+import { validateSignup, validateLogin, authenticateUser } from "../middlewares/userMiddleware.js";
 
 const userRouter = express.Router();
 
+// Public routes
 userRouter.post("/signup", validateSignup, signupUser);
 userRouter.post("/login", validateLogin, loginUser);
-userRouter.get("/profile", protect, getUserProfile);
+
+// Protected routes (require authentication)
+userRouter.get("/search", authenticateUser, searchUsers); // Add search route
 
 export default userRouter;

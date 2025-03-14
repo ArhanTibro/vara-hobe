@@ -1,130 +1,130 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import axios from "axios";
 
 const List = () => {
-  const [properties, setProperties] = useState([]);
+  const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchProperties = async () => {
-      try {
-        const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setError("You need to be logged in to view listings.");
+      setLoading(false);
+      return;
+    }
 
-        if (!token) {
-          setError("You need to be logged in to view listings.");
-          setLoading(false);
-          return;
-        }
-
-        const response = await axios.get("http://localhost:4000/api/list/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setProperties(response.data);
-      } catch (err) {
-        console.error("Error fetching properties:", err);
-        setError("Failed to fetch properties. Please try again.");
-      } finally {
+    axios
+      .get("http://localhost:4000/api/list/", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        setListings(response.data);
         setLoading(false);
-      }
-    };
-
-    fetchProperties();
+      })
+      .catch(() => {
+        // Use underscore to indicate the error is intentionally unused
+        setError("Failed to fetch listings");
+        setLoading(false);
+      });
   }, []);
 
-  const sliderSettings = (imageCount) => ({
-    dots: imageCount > 1,
-    infinite: imageCount > 1,
+  // Slider settings
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    arrows: imageCount > 1,
-  });
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+  };
+
+  if (loading)
+    return (
+      <p className="text-center text-gray-600 animate-pulse">Loading...</p>
+    );
+  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <div className="container mx-auto p-4 flex flex-col gap-6">
-      {loading ? (
-        <p className="text-center text-gray-600">Loading properties...</p>
-      ) : error ? (
-        <p className="text-center text-red-500">{error}</p>
-      ) : properties.length === 0 ? (
-        <p className="text-center text-gray-600">No properties available.</p>
-      ) : (
-        properties.map((property) => {
-          const images = Array.isArray(property.images) ? property.images : [];
-          return (
-            <Link
-              to={`/property/${property._id}`}
-              key={property._id}
-              className="block"
-            >
-              <div
-                className="bg-[#C0BCB5] p-4 rounded-lg shadow-md flex flex-col md:flex-row gap-4 
-                transition-transform duration-300 hover:scale-105 hover:shadow-lg cursor-pointer"
-              >
-                {/* Image Slider */}
-                <div className="w-full md:w-1/3">
-                  {images.length > 0 ? (
-                    <Slider
-                      {...sliderSettings(images.length)}
-                      className="rounded-lg overflow-hidden"
-                    >
-                      {images.map((image, i) => (
-                        <div key={`${property._id}-image-${i}`}>
-                          <img
-                            src={image}
-                            alt={`Property ${i + 1}`}
-                            className="w-full h-48 object-cover rounded-lg"
-                          />
-                        </div>
-                      ))}
-                    </Slider>
-                  ) : (
-                    <div className="h-48 bg-gray-300 rounded-lg flex items-center justify-center">
-                      <span>No Image Available</span>
+    <div className="container mx-auto p-4">
+      <h2 className="text-3xl font-bold text-center mb-8 text-blue-600">
+        Available Listings
+      </h2>
+      <div className="space-y-8">
+        {listings.map((listing) => (
+          <div
+            key={listing._id}
+            className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col md:flex-row"
+          >
+            {/* Left: Image Carousel or Single Image */}
+            <div className="w-full md:w-1/2">
+              {listing.image.length > 1 ? (
+                // Render slider only if there are multiple images
+                <Slider {...sliderSettings}>
+                  {listing.image.map((img, index) => (
+                    <div key={index}>
+                      <img
+                        src={img}
+                        alt={`${listing.title} - Image ${index + 1}`}
+                        className="w-full h-96 object-cover"
+                      />
                     </div>
-                  )}
+                  ))}
+                </Slider>
+              ) : (
+                // Render single image directly if there's only one
+                <div>
+                  <img
+                    src={listing.image[0]}
+                    alt={listing.title}
+                    className="w-full h-96 object-cover"
+                  />
                 </div>
+              )}
+            </div>
 
-                {/* Property Details */}
-                <div className="w-full md:w-1/3">
-                  <h3 className="text-xl font-semibold">{property.title}</h3>
-                  <hr className="my-2 border-gray-400" />
-                  <p className="text-gray-700">{property.description}</p>
-                </div>
-
-                {/* Additional Details */}
-                <div className="w-full md:w-1/3 flex flex-col gap-2">
-                  <p>
-                    <strong>Rooms:</strong> {property.roomCount?.bedroom || 0}
-                  </p>
-                  <p>
-                    <strong>Washrooms:</strong>{" "}
-                    {property.roomCount?.washroom || 0}
-                  </p>
-                  <p>
-                    <strong>Size:</strong> {property.size} sq ft
-                  </p>
-                  <p>
-                    <strong>Rent:</strong> ${property.rent}
-                  </p>
-                  <p>
-                    <strong>Contact:</strong> {property.phone1}
-                    {property.phone2 && ` / ${property.phone2}`}
-                  </p>
-                </div>
+            {/* Right: Details */}
+            <div className="w-full md:w-1/2 p-6 flex flex-col justify-center">
+              <h3 className="text-2xl font-semibold mb-2 text-gray-800">
+                {listing.title}
+              </h3>
+              <p className="text-gray-600 mb-4">
+                {listing.type} - {listing.area}
+              </p>
+              <div className="space-y-2 text-gray-700">
+                <p>
+                  <strong>Bedrooms:</strong> {listing.roomCount.bedroom}
+                </p>
+                <p>
+                  <strong>Washrooms:</strong> {listing.roomCount.washroom}
+                </p>
+                <p>
+                  <strong>Balconies:</strong> {listing.roomCount.balcony}
+                </p>
+                <p>
+                  <strong>Size:</strong> {listing.size} sqft
+                </p>
+                <p className="text-xl font-bold text-blue-600">
+                  ৳{listing.rent} / month
+                </p>
               </div>
-            </Link>
-          );
-        })
-      )}
+              <button
+                onClick={() => navigate(`/property/${listing._id}`)} // Updated route
+                className="mt-4 bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300"
+              >
+                View Details
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
