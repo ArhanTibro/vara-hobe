@@ -6,5 +6,6 @@ const rootRouter = express.Router();
 
 rootRouter.use("/user", userRouter);
 rootRouter.use("/list", listRouter);
+rootRouter.use("/chat", chatRouter);
 
 export default rootRouter;
