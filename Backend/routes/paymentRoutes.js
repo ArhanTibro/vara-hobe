@@ -6,10 +6,11 @@ import {
   cancelPayment,
 } from "../controllers/paymentController.js";
 import { authenticateUser } from "../middlewares/userMiddleware.js";
+import log from "../middlewares/logger.js";
 
 const payRouter = express.Router();
 
-payRouter.post("/generate/:listId", authenticateUser, generateSslPayment);
+payRouter.post("/generate/:listId", authenticateUser,log, generateSslPayment);
 payRouter.get("/success/:tranId", successPayment);
 payRouter.get("/fail/:tranId", failPayment);
 payRouter.get("/cancel/:tranId", cancelPayment);
