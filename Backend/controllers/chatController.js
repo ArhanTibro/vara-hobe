@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import chats from "../data/data.js";
+import { chats } from "../data/data.js";
 
 export const getChat = (res, req) => {
   const id = req.body;

@@ -1,9 +1,25 @@
 import jwt from "jsonwebtoken";
 
 export const validateSignup = (req, res, next) => {
-  const { fullName, username, email, password, confirmPassword, phoneNumber, presentAddress } = req.body;
+  const {
+    fullName,
+    username,
+    email,
+    password,
+    confirmPassword,
+    phoneNumber,
+    presentAddress,
+  } = req.body;
 
-  if (!fullName || !username || !email || !password || !confirmPassword || !phoneNumber || !presentAddress) {
+  if (
+    !fullName ||
+    !username ||
+    !email ||
+    !password ||
+    !confirmPassword ||
+    !phoneNumber ||
+    !presentAddress
+  ) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -28,7 +44,9 @@ export const authenticateUser = (req, res, next) => {
   const authHeader = req.header("Authorization");
   console.log("Auth Header:", authHeader); // Debugging full Authorization header
 
-  const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
+  const token = authHeader?.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : null;
   console.log("Extracted Token:", token); // Debugging extracted token
 
   if (!token) {
@@ -43,5 +61,40 @@ export const authenticateUser = (req, res, next) => {
   } catch (error) {
     console.error("JWT Verification Error:", error);
     return res.status(401).json({ message: "Invalid or expired token" });
+  }
+};
+
+export const protect = async (req, res, next) => {
+  let token;
+
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    try {
+      token = req.headers.authorization.split(" ")[1];
+
+      // Decode the token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      // Find the user by username
+      req.user = await User.findOne({ username: decoded.username }).select(
+        "-password"
+      );
+
+      if (!req.user) {
+        return res
+          .status(401)
+          .json({ message: "User not found, not authorized" });
+      }
+
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: "Not authorized, token failed" });
+    }
+  }
+
+  if (!token) {
+    return res.status(401).json({ message: "Not authorized, no token" });
   }
 };
