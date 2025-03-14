@@ -2,19 +2,21 @@ import express from "express";
 import {
   signupUser,
   loginUser,
-  allUsers,
-} from "../controllers/userController.js";
-
+  searchUsers,
+} from "../controllers/userController.js"; // Import searchUsers
 import {
   validateSignup,
   validateLogin,
-  protect,
+  authenticateUser,
 } from "../middlewares/userMiddleware.js";
 
 const userRouter = express.Router();
 
-userRouter.get("/src", protect, allUsers);
+// Public routes
 userRouter.post("/signup", validateSignup, signupUser);
 userRouter.post("/login", validateLogin, loginUser);
+
+// Protected routes (require authentication)
+userRouter.get("/search", authenticateUser, searchUsers); // Add search route
 
 export default userRouter;

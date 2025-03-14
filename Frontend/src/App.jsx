@@ -15,6 +15,7 @@ import Profile from "./Pages/Profile";
 import ChatPage from "./Pages/ChatPage";
 import Navbar from "./Components/Navbar";
 import PropertyDetail from "./Pages/list_description"; // Import the PropertyDetail component
+import OtherUserProfile from "./Pages/otherUserProfile";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false); //  Start as logged out
@@ -67,6 +68,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signUp" element={<SignupPage />} />
           <Route path="/property/:id" element={<PropertyDetail />} />
+          <Route path="/profile/:userId" element={<OtherUserProfile />} />
         </Routes>
       </div>
     </>

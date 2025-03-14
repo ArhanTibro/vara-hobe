@@ -1,47 +1,35 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Footer from "../Components/Footer";
 import List from "../Components/List";
 import axios from "axios";
+import Navbar from "../Components/Navbar";
 
-const ProfilePage = () => {
+const OtherUserProfile = () => {
+  const { userId } = useParams(); // Get user ID from the URL
   const [user, setUser] = useState(null);
   const [rating, setRating] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem("accessToken");
-
-      if (!token) {
-        navigate("/login"); // Redirect to login if no token found
-        return;
-      }
-
+    const fetchOtherUserProfile = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/user/profile",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          `http://localhost:4000/api/user/profile/${userId}`
         );
-
         setUser(response.data.user);
         setRating(response.data.user.rating);
         setLoading(false);
       } catch (err) {
         console.error("Profile Fetch Error:", err);
         setError("Failed to load profile. Please try again.");
-        navigate("/login");
       }
     };
 
-    fetchUserData();
-  }, [navigate]);
+    fetchOtherUserProfile();
+  }, [userId]);
 
   const handleRating = (rate) => {
     setRating(rate);
@@ -57,13 +45,12 @@ const ProfilePage = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <Navbar />
       <div className="min-h-screen bg-[#EBECED] flex flex-col items-center p-6">
         <div className="w-full max-w-4xl bg-white shadow-lg rounded-2xl p-6">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <img
-              src={
-                "https://media.istockphoto.com/id/1327592449/vector/default-avatar-photo-placeholder-icon-grey-profile-picture-business-man.jpg?s=612x612&w=0&k=20&c=yqoos7g9jmufJhfkbQsk-mdhKEsih6Di4WZ66t_ib7I="
-              }
+              src={user.profileImage || "https://via.placeholder.com/150"}
               alt="Profile"
               className="w-40 h-40 rounded-full border-4 border-[#C0BCB5]"
             />
@@ -111,9 +98,9 @@ const ProfilePage = () => {
           {/* House Listings */}
           <div className="mt-8">
             <h3 className="text-2xl font-bold text-[#3F4651] mb-4">
-              My Listings
+              Listings by {user.fullName}
             </h3>
-            <List />
+            <List userId={userId} />
           </div>
         </div>
       </div>
@@ -123,4 +110,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default OtherUserProfile;

@@ -51,7 +51,13 @@ export const signupUser = async (req, res) => {
 
     res.status(201).json({
       message: "User registered successfully",
-      user: { username, email, role: newUser.role, rating: newUser.rating },
+      user: {
+        id: newUser._id,
+        username,
+        email,
+        role: newUser.role,
+        rating: newUser.rating,
+      },
       accessToken,
     });
   } catch (error) {
@@ -82,6 +88,7 @@ export const loginUser = async (req, res) => {
     res.status(200).json({
       message: "Login successful",
       user: {
+        id: user._id,
         username: user.username,
         email: user.email,
         role: user.role,
@@ -95,19 +102,26 @@ export const loginUser = async (req, res) => {
   }
 };
 
-export const allUsers = async (req, res) => {
-  const keyword = req.query.search
-    ? {
-        $or: [
-          { name: { $regex: req.query.search, $options: "i" } },
-          { email: { $regex: req.query.search, $option: "i" } },
-        ],
-      }
-    : {};
+// Search users by username
+export const searchUsers = async (req, res) => {
+  const { username } = req.query;
 
-  console.log(keyword);
-  const users = await User.find(keyword).find({
-    username: { $ne: req.user.username },
-  });
-  res.send(users);
+  if (!username) {
+    return res
+      .status(400)
+      .json({ message: "Username query parameter is required" });
+  }
+
+  try {
+    const users = await User.find({
+      username: { $regex: username, $options: "i" },
+    })
+      .select("username fullName email")
+      .limit(10); // Limit results to 10 users
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Search Users Error:", error);
+    res.status(500).json({ message: "Failed to search users" });
+  }
 };

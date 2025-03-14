@@ -4,9 +4,9 @@ const storage = multer.memoryStorage(); // Store file in memory as buffer
 export const upload = multer({ storage }).array("image", 5);
 
 export const validateListing = (req, res, next) => {
-  const { title, type, roomCount, description, location, size, area, public: isPublic } = req.body;
+  const { title, type, roomCount, description, location, size, area, rent } = req.body;
 
-  if (!title || !type || !roomCount || !description || !location || !size || !area) {
+  if (!title || !type || !roomCount || !description || !location || !size || !area || rent === undefined) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -31,8 +31,8 @@ export const validateListing = (req, res, next) => {
     return res.status(400).json({ message: "Invalid area selected" });
   }
 
-  if (isPublic !== undefined && typeof JSON.parse(isPublic) !== "boolean") {
-    return res.status(400).json({ message: "Invalid value for public field" });
+  if (isNaN(rent) || rent < 0) {
+    return res.status(400).json({ message: "Invalid rent amount" });
   }
 
   next();
