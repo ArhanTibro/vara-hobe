@@ -1,6 +1,7 @@
 import express from "express";
 import userRouter from "./userRoutes.js";
 import listRouter from "./addListRoutes.js";
+import chatRouter from "./chatRouter.js";
 
 const rootRouter = express.Router();
 
