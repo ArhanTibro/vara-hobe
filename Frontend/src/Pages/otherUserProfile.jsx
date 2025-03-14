@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Footer from "../Components/Footer";
 import axios from "axios";
+import List from "../Components/List";
 //import Navbar from "../Components/Navbar";
 
 const OtherUserProfile = () => {
@@ -12,6 +13,7 @@ const OtherUserProfile = () => {
   const [error, setError] = useState(null);
   const [ratingError, setRatingError] = useState(null); // Track rating submission errors
   const [ratingLoading, setRatingLoading] = useState(false); // Track rating submission loading state
+  const [showRatingModal, setShowRatingModal] = useState(false); // Track whether the rating modal is visible
   const navigate = useNavigate();
 
   // Fetch other user's profile data
@@ -48,10 +50,15 @@ const OtherUserProfile = () => {
   // Handle rating submission
   const handleRateUser = async () => {
     const token = localStorage.getItem("accessToken");
+
+    console.log("accesss token is working");
     if (!token) return;
 
+    console.log("Token found:", token); // Debugging log
+
     // Check if the user is trying to rate themselves
-    const loggedInUserId = JSON.parse(localStorage.getItem("user")).id;
+    loggedInUserId = JSON.parse(localStorage.getItem("user")).id;
+    console.log("LoggedInUI:", loggedInUserId); //this line is not working
     if (loggedInUserId === userId) {
       setRatingError("You cannot rate yourself.");
       return;
@@ -59,6 +66,7 @@ const OtherUserProfile = () => {
 
     setRatingLoading(true);
     try {
+      console.log("Submitting rating:", selectedRating); // Debugging log
       await axios.post(
         `http://localhost:4000/api/user/${userId}/rate`,
         { rating: selectedRating },
@@ -66,16 +74,32 @@ const OtherUserProfile = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      console.log("Rating submitted successfully"); // Debugging log
       alert("Rating submitted successfully!");
       setUser((prevUser) => ({ ...prevUser, rating: selectedRating })); // Update the displayed rating
       setSelectedRating(0); // Reset the selected rating
       setRatingError(null); // Clear any previous errors
+      setShowRatingModal(false); // Close the modal after submission
     } catch (err) {
       console.error("Rating Error:", err);
       setRatingError("Failed to submit rating. Please try again.");
     } finally {
       setRatingLoading(false);
     }
+  };
+
+  // Open the rating modal
+  const openRatingModal = () => {
+    if (selectedRating === 0) {
+      setRatingError("Please select a rating before submitting.");
+      return;
+    }
+    setShowRatingModal(true);
+  };
+
+  // Close the rating modal
+  const closeRatingModal = () => {
+    setShowRatingModal(false);
   };
 
   if (loading) {
@@ -142,7 +166,7 @@ const OtherUserProfile = () => {
               <p className="text-center text-red-500 mt-2">{ratingError}</p>
             )}
             <button
-              onClick={handleRateUser}
+              onClick={openRatingModal}
               disabled={ratingLoading}
               className={`mt-4 bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 ${
                 ratingLoading ? "opacity-50 cursor-not-allowed" : ""
@@ -152,7 +176,37 @@ const OtherUserProfile = () => {
             </button>
           </div>
         </div>
+        <List />
       </div>
+
+      {/* Rating Modal */}
+      {showRatingModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm">
+            <h3 className="text-xl font-bold text-[#3F4651] mb-4">
+              Confirm Rating
+            </h3>
+            <p className="text-[#3F4651] mb-4">
+              You are about to rate this user with {selectedRating} star
+              {selectedRating !== 1 ? "s" : ""}. Are you sure?
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={closeRatingModal}
+                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRateUser} // Ensure this is correctly bound
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
