@@ -8,6 +8,8 @@ const ChatPage = () => {
   const [messages, setMessages] = useState([]);
   const [receiver, setReceiver] = useState(null);
 
+  console.log("ChatPage Initialized");
+
   const fetchMessages = async (receiverId) => {
     try {
       const response = await axios.get(
