@@ -100,3 +100,60 @@ export const searchUsers = async (req, res) => {
     res.status(500).json({ message: "Failed to search users" });
   }
 };
+
+
+// userController.js
+export const getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password"); // Exclude password from the response
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error("Profile Fetch Error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+
+// Get another user's profile by ID
+export const getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select("-password"); // Exclude password
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error("Get User Error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// Rate another user
+export const rateUser = async (req, res) => {
+  const { userId } = req.params;
+  const { rating } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update the user's rating (example: average rating)
+    const totalRatings = user.rating * user.ratingCount;
+    const newRatingCount = user.ratingCount + 1;
+    const newRating = (totalRatings + rating) / newRatingCount;
+
+    user.rating = newRating;
+    user.ratingCount = newRatingCount;
+    await user.save();
+
+    res.status(200).json({ message: "Rating submitted successfully", user });
+  } catch (error) {
+    console.error("Rate User Error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
