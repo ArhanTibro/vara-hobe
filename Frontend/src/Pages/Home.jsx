@@ -1,7 +1,7 @@
 import bg from "../assets/bg.webp";
 import Footer from "../Components/Footer";
 import List from "../Components/List";
-import SearchBox from "../Components/SearchBox";
+//import SearchBox from "../Components/SearchBox";
 
 const Home = () => {
   return (
@@ -30,7 +30,7 @@ const Home = () => {
       </div>
 
       {/* Search Box */}
-      <SearchBox />
+
       <List />
       <Footer />
     </div>
