@@ -19,6 +19,6 @@ userRouter.post("/login", validateLogin, loginUser);
 userRouter.get("/search", authenticateUser, searchUsers); // Search users by username
 userRouter.get("/profile", authenticateUser, getProfile); // Get logged-in user's profile
 userRouter.get("/:userId", authenticateUser, getUserById); // Get another user's profile by ID
-userRouter.post("/:userId/rate", authenticateUser, rateUser); // Rate another user
+userRouter.post("/:userId/rate",  rateUser); // Rate another user
 
 export default userRouter;

@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Footer from "../Components/Footer";
 import axios from "axios";
-import List from "../Components/List";
-//import Navbar from "../Components/Navbar";
 
 const OtherUserProfile = () => {
   const { userId } = useParams(); // Get user ID from the URL
@@ -49,16 +47,8 @@ const OtherUserProfile = () => {
 
   // Handle rating submission
   const handleRateUser = async () => {
-    const token = localStorage.getItem("accessToken");
-
-    console.log("accesss token is working");
-    if (!token) return;
-
-    console.log("Token found:", token); // Debugging log
-
     // Check if the user is trying to rate themselves
-    loggedInUserId = JSON.parse(localStorage.getItem("user")).id;
-    console.log("LoggedInUI:", loggedInUserId); //this line is not working
+    const loggedInUserId = JSON.parse(localStorage.getItem("user"))?.id;
     if (loggedInUserId === userId) {
       setRatingError("You cannot rate yourself.");
       return;
@@ -66,15 +56,9 @@ const OtherUserProfile = () => {
 
     setRatingLoading(true);
     try {
-      console.log("Submitting rating:", selectedRating); // Debugging log
-      await axios.post(
-        `http://localhost:4000/api/user/${userId}/rate`,
-        { rating: selectedRating },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      console.log("Rating submitted successfully"); // Debugging log
+      await axios.post(`http://localhost:4000/api/user/${userId}/rate`, {
+        rating: selectedRating,
+      });
       alert("Rating submitted successfully!");
       setUser((prevUser) => ({ ...prevUser, rating: selectedRating })); // Update the displayed rating
       setSelectedRating(0); // Reset the selected rating
