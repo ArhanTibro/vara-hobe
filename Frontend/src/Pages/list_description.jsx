@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 const PropertyDetail = () => {
-  const { id } = useParams(); // Get the listing ID from the URL
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
 
   // Fetch property details
   useEffect(() => {
@@ -42,6 +44,28 @@ const PropertyDetail = () => {
 
     fetchListing();
   }, [id]);
+
+  // Fetch user role
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/api/user/profile`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setUserRole(response.data.role);
+      } catch (error) {
+        console.error("Failed to fetch user role:", error);
+      }
+    };
+
+    fetchUserRole();
+  }, []);
 
   // Search users by username
   const handleSearch = async () => {
@@ -102,16 +126,31 @@ const PropertyDetail = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log("Payment Response:", response.data); // Debugging output
-
       if (response.data.paymentUrl) {
-        window.location.href = response.data.paymentUrl; // Redirect to payment gateway
+        window.location.href = response.data.paymentUrl;
       } else {
         alert("Failed to retrieve payment URL.");
       }
     } catch (error) {
       console.error("Payment initiation error:", error);
       alert("Failed to initiate payment. Please try again.");
+    }
+  };
+
+  // Handle delete listing
+  const handleDeleteListing = async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    try {
+      await axios.delete(`http://localhost:4000/api/list/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      alert("Listing deleted successfully!");
+      navigate("/");
+    } catch (error) {
+      console.error("Delete Listing Error:", error);
+      alert("Failed to delete listing. Please try again.");
     }
   };
 
@@ -139,12 +178,7 @@ const PropertyDetail = () => {
   const loggedInUserId = localStorage.getItem("userId");
   const isOwner = listing.seller?._id === loggedInUserId;
   const hasAccess = listing.access === loggedInUserId;
-
-  // Debugging: Log seller and user IDs
-  console.log("Seller ID:", listing.seller?._id);
-  console.log("Logged-in User ID:", loggedInUserId);
-  console.log("Is Owner:", isOwner);
-  console.log("Has Access:", hasAccess);
+  const isAdmin = userRole === "admin";
 
   return (
     <div className="container mx-auto p-4">
@@ -182,6 +216,20 @@ const PropertyDetail = () => {
               className="w-full h-96 object-cover"
             />
           )}
+
+          {/* Seller Information (Owner) */}
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <h3 className="text-xl font-semibold mb-2 text-gray-800">Owner</h3>
+            <p className="text-gray-700">
+              <strong>Name:</strong> {listing.seller?.fullName}
+            </p>
+            <p className="text-gray-700">
+              <strong>Phone:</strong> {listing.seller?.phoneNumber}
+            </p>
+            <p className="text-gray-700">
+              <strong>Address:</strong> {listing.seller?.presentAddress}
+            </p>
+          </div>
         </div>
 
         {/* Right: Property Details */}
@@ -216,9 +264,6 @@ const PropertyDetail = () => {
             </p>
             <p>
               <strong>Description:</strong> {listing.description}
-            </p>
-            <p>
-              <strong>Seller:</strong> {listing.seller?.fullName}
             </p>
           </div>
 
@@ -287,6 +332,18 @@ const PropertyDetail = () => {
                 className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600"
               >
                 Pay ৳{listing.rent} / month
+              </button>
+            </div>
+          )}
+
+          {/* Delete Button (Only for Owner or Admin) */}
+          {(isOwner || isAdmin) && (
+            <div className="mt-8">
+              <button
+                onClick={handleDeleteListing}
+                className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600"
+              >
+                Delete Listing
               </button>
             </div>
           )}

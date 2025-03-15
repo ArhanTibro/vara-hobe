@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import mongoose from "mongoose";
 
 dotenv.config();
 
@@ -123,6 +124,38 @@ export const searchUsers = async (req, res) => {
   } catch (error) {
     console.error("Search Users Error:", error);
     res.status(500).json({ message: "Failed to search users" });
+  }
+};
+
+export const searchUserForMessenger = async (req, res) => {
+  const { userId } = req.query;
+
+  // Check if userId is provided
+  if (!userId) {
+    return res
+      .status(400)
+      .json({ message: "User ID query parameter is required" });
+  }
+
+  // Check if userId is a valid ObjectId
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ message: "Invalid User ID" });
+  }
+
+  try {
+    // Find the user by their ID
+    const user = await User.findById(userId).select("username fullName email");
+
+    // If no user is found, return an empty array
+    if (!user) {
+      return res.status(200).json([]); // Ensure an empty array is returned
+    }
+
+    // Return the user in an array
+    res.status(200).json([user]); // This ensures the response is always an array
+  } catch (error) {
+    console.error("Search User for Messenger Error:", error);
+    res.status(500).json({ message: "Failed to search for user" });
   }
 };
 

@@ -58,7 +58,7 @@ function App() {
             element={isLoggedIn ? <AddListU /> : <Navigate to="/login" />}
           />
           <Route
-            path="/chatPage"
+            path="/chatpage"
             element={isLoggedIn ? <ChatPage /> : <Navigate to="/login" />}
           />
           <Route

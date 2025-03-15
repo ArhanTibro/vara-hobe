@@ -58,7 +58,7 @@ const Navbar = () => {
           </li>
           <li>
             <Link
-              to={isLoggedIn ? "/chatPage" : "/login"}
+              to={isLoggedIn ? "/chatpage" : "/login"}
               className="hover:text-white"
             >
               Messenger

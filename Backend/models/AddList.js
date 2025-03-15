@@ -2,8 +2,17 @@ import mongoose from "mongoose";
 
 const AddListSchema = new mongoose.Schema(
   {
-    title: { type: String, required: [true, "No title"], trim: true, minlength: [3, "Too short"] },
-    type: { type: String, enum: ["Residential", "Office", "Warehouse"], required: true },
+    title: {
+      type: String,
+      required: [true, "No title"],
+      trim: true,
+      minlength: [3, "Too short"],
+    },
+    type: {
+      type: String,
+      enum: ["Residential", "Office", "Warehouse"],
+      required: true,
+    },
     roomCount: {
       bedroom: { type: Number, required: true, min: [0, "Invalid number"] },
       washroom: { type: Number, required: true, min: [0, "Invalid number"] },
@@ -36,10 +45,18 @@ const AddListSchema = new mongoose.Schema(
       required: true,
     },
     image: { type: [String], required: true }, // Store file path instead of Base64
-    seller: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    seller: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     likes: { type: Number, default: 0 },
     occupied: { type: Boolean, default: false },
-    access: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null }, // New access field added
+    access: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    }, // New access field added
   },
   { timestamps: true }
 );
