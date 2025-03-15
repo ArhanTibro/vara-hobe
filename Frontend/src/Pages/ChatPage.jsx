@@ -160,7 +160,8 @@ const ChatPage = () => {
 
   // Fetch the current user when the component mounts
   useEffect(() => {
-    fetchCurrentUser();
+    fetchRecentContacts();
+    window.scrollTo(0, 0);
   }, []);
 
   // Set recent contacts (filter out the current user)

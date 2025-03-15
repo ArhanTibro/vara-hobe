@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Footer from "../Components/Footer";
 import axios from "axios";
+import OtherUserList from "../Components/OtherUserList";
 
 const OtherUserProfile = () => {
   const { userId } = useParams(); // Get user ID from the URL
@@ -42,6 +43,7 @@ const OtherUserProfile = () => {
     };
 
     fetchOtherUserProfile();
+    window.scrollTo(0, 0);
   }, [userId, navigate]);
 
   // Handle rating submission
@@ -144,6 +146,7 @@ const OtherUserProfile = () => {
             </button>
           </div>
         </div>
+        <OtherUserList />
       </div>
 
       <Footer />

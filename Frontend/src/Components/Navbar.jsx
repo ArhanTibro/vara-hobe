@@ -25,7 +25,9 @@ const Navbar = () => {
         {/* Logo */}
         <div className="flex items-center space-x-4">
           <img src={logo} alt="Logo" className="h-10 w-10 object-contain" />
-          <span className="text-[#C0BCB5] text-lg font-bold">Vara-Hobe</span>
+          <Link to="/" className="text-[#C0BCB5] text-lg font-bold">
+            Vara-Hobe
+          </Link>
         </div>
 
         {/* Hamburger Menu for Mobile */}
