@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../Components/Footer";
-import List from "../Components/List";
+//import List from "../Components/List";
 import axios from "axios";
+import MyList from "../Components/MyList";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -159,7 +160,7 @@ const ProfilePage = () => {
             <h3 className="text-2xl font-bold text-[#3F4651] mb-4">
               My Listings
             </h3>
-            <List />
+            <MyList />
           </div>
         </div>
       </div>

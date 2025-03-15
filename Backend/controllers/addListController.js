@@ -37,7 +37,8 @@ const uploadToCloudinary = (buffer, filename) => {
 
 // 🏡 Add New Listing
 export const addListing = async (req, res) => {
-  const { title, type, roomCount, size, description, location, area, rent } = req.body;
+  const { title, type, roomCount, size, description, location, area, rent } =
+    req.body;
 
   try {
     let imagePaths = [];
@@ -45,7 +46,9 @@ export const addListing = async (req, res) => {
     if (req.files && req.files.length > 0) {
       // Upload images to Cloudinary
       imagePaths = await Promise.all(
-        req.files.map((file) => uploadToCloudinary(file.buffer, file.originalname))
+        req.files.map((file) =>
+          uploadToCloudinary(file.buffer, file.originalname)
+        )
       );
     }
 
@@ -64,7 +67,9 @@ export const addListing = async (req, res) => {
     });
 
     await newListing.save();
-    res.status(201).json({ message: "Listing added successfully", listing: newListing });
+    res
+      .status(201)
+      .json({ message: "Listing added successfully", listing: newListing });
   } catch (error) {
     console.error("Add Listing Error:", error);
     res.status(500).json({ message: "Server Error" });
@@ -74,7 +79,10 @@ export const addListing = async (req, res) => {
 // 📃 Get All Listings
 export const getAllListings = async (req, res) => {
   try {
-    const listings = await List.find().populate("seller", "fullName phoneNumber presentAddress");
+    const listings = await List.find().populate(
+      "seller",
+      "fullName phoneNumber presentAddress"
+    );
     res.status(200).json(listings);
   } catch (error) {
     console.error("Get Listings Error:", error);
@@ -85,7 +93,10 @@ export const getAllListings = async (req, res) => {
 // 🔍 Get Single Listing
 export const getListingById = async (req, res) => {
   try {
-    const listing = await List.findById(req.params.id).populate("seller", "fullName phoneNumber presentAddress");
+    const listing = await List.findById(req.params.id).populate(
+      "seller",
+      "fullName phoneNumber presentAddress"
+    );
     if (!listing) return res.status(404).json({ message: "Listing not found" });
     res.status(200).json(listing);
   } catch (error) {
@@ -113,7 +124,9 @@ export const updateListing = async (req, res) => {
 
       // 🚀 Upload new images to Cloudinary
       newImagePaths = await Promise.all(
-        req.files.map((file) => uploadToCloudinary(file.buffer, file.originalname))
+        req.files.map((file) =>
+          uploadToCloudinary(file.buffer, file.originalname)
+        )
       );
     }
 
@@ -191,7 +204,11 @@ export const purchaseListing = async (req, res) => {
     ship_country: "Bangladesh",
   };
 
-  const sslcz = new SSLCommerzPayment(SSL_STORE_ID, SSL_STORE_PASSWORD, SSL_IS_SANDBOX);
+  const sslcz = new SSLCommerzPayment(
+    SSL_STORE_ID,
+    SSL_STORE_PASSWORD,
+    SSL_IS_SANDBOX
+  );
   sslcz
     .init(data)
     .then(async (apiResponse) => {
@@ -215,21 +232,30 @@ export const purchaseListing = async (req, res) => {
 // ✅ Handle Payment Success
 export const successPayment = async (req, res) => {
   const { tranId } = req.params;
-  await Payment.findOneAndUpdate({ transactionId: tranId }, { status: "success" });
+  await Payment.findOneAndUpdate(
+    { transactionId: tranId },
+    { status: "success" }
+  );
   return res.redirect(`${ALLOWED_ORIGIN}/payment-success`);
 };
 
 // ❌ Handle Payment Failure
 export const failPayment = async (req, res) => {
   const { tranId } = req.params;
-  await Payment.findOneAndUpdate({ transactionId: tranId }, { status: "failed" });
+  await Payment.findOneAndUpdate(
+    { transactionId: tranId },
+    { status: "failed" }
+  );
   return res.redirect(`${ALLOWED_ORIGIN}/payment-fail`);
 };
 
 // 🚫 Handle Payment Cancellation
 export const cancelPayment = async (req, res) => {
   const { tranId } = req.params;
-  await Payment.findOneAndUpdate({ transactionId: tranId }, { status: "canceled" });
+  await Payment.findOneAndUpdate(
+    { transactionId: tranId },
+    { status: "canceled" }
+  );
   return res.redirect(`${ALLOWED_ORIGIN}/payment-cancel`);
 };
 
@@ -243,7 +269,6 @@ export const getPayments = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
-
 
 // 🔑 Grant Access to Listing
 export const setListingAccess = async (req, res) => {
