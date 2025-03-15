@@ -1,4 +1,5 @@
 import bg from "../assets/bg.webp";
+import FloatingMessenger from "../Components/FloatingMessenger";
 import Footer from "../Components/Footer";
 import List from "../Components/List";
 //import SearchBox from "../Components/SearchBox";
@@ -32,6 +33,7 @@ const Home = () => {
       {/* Search Box */}
 
       <List />
+      <FloatingMessenger />
       <Footer />
     </div>
   );
