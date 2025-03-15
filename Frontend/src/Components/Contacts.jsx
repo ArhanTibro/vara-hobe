@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const Contacts = ({ setReceiver }) => {
-  const [users, setUsers] = useState([]); // Initialize as an empty array
-  const [searchQuery, setSearchQuery] = useState(""); // State for search query
-  const [searchResults, setSearchResults] = useState([]); // State for search results
+const Contacts = ({ setReceiver, recentContacts }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // Handle search input change
@@ -89,11 +88,11 @@ const Contacts = ({ setReceiver }) => {
         </div>
       )}
 
-      {/* Display Contacts List */}
-      <h3 className="text-md font-semibold mb-2">All Contacts</h3>
+      {/* Display Recently Contacted Users */}
+      <h3 className="text-md font-semibold mb-2">Recent Contacts</h3>
       <ul>
-        {Array.isArray(users) &&
-          users.map((user) => (
+        {Array.isArray(recentContacts) &&
+          recentContacts.map((user) => (
             <li
               key={user._id}
               className="cursor-pointer hover:bg-gray-200 p-2 rounded"
