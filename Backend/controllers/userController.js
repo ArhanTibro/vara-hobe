@@ -1,27 +1,37 @@
-import User from '../models/User.js';
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+import User from "../models/User.js";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
 
 dotenv.config();
 
 // Function to generate JWT token
 const generateAccessToken = (user) => {
   return jwt.sign(
-    { id: user._id, username: user.username, email: user.email, role: user.role, rating: user.rating },
+    {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      rating: user.rating,
+    },
     process.env.JWT_SECRET,
-    { expiresIn: '5h' } // Token expires in 5 hours
+    { expiresIn: "5h" } // Token expires in 5 hours
   );
 };
 
 // User Signup Controller
 export const signupUser = async (req, res) => {
-  const { fullName, username, email, password, phoneNumber, presentAddress } = req.body;
+  const { fullName, username, email, password, phoneNumber, presentAddress } =
+    req.body;
 
   try {
     // Check if user already exists
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
-      return res.status(400).json({ message: 'Username or Email already exists' });
+      return res
+        .status(400)
+        .json({ message: "Username or Email already exists" });
     }
 
     // Create new user with default role and rating
@@ -33,21 +43,27 @@ export const signupUser = async (req, res) => {
       phoneNumber,
       presentAddress,
       role: "user", // Role is hardcoded
-      rating: 0 // Default rating
+      rating: 0, // Default rating
     });
 
     await newUser.save();
 
     const accessToken = generateAccessToken(newUser);
 
-    res.status(201).json({ 
-      message: 'User registered successfully', 
-      user: { id: newUser._id, username, email, role: newUser.role, rating: newUser.rating }, 
-      accessToken
+    res.status(201).json({
+      message: "User registered successfully",
+      user: {
+        id: newUser._id,
+        username,
+        email,
+        role: newUser.role,
+        rating: newUser.rating,
+      },
+      accessToken,
     });
   } catch (error) {
-    console.error('Signup Error:', error);
-    res.status(500).json({ message: 'Server Error' });
+    console.error("Signup Error:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
@@ -59,25 +75,31 @@ export const loginUser = async (req, res) => {
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid Email or Password' });
+      return res.status(400).json({ message: "Invalid Email or Password" });
     }
 
     // Check password
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid Email or Password' });
+      return res.status(400).json({ message: "Invalid Email or Password" });
     }
 
     const accessToken = generateAccessToken(user);
 
-    res.status(200).json({ 
-      message: 'Login successful', 
-      user: { id: user._id, username: user.username, email: user.email, role: user.role, rating: user.rating }, 
-      accessToken
+    res.status(200).json({
+      message: "Login successful",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        rating: user.rating,
+      },
+      accessToken,
     });
   } catch (error) {
-    console.error('Login Error:', error);
-    res.status(500).json({ message: 'Server Error' });
+    console.error("Login Error:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
@@ -86,11 +108,15 @@ export const searchUsers = async (req, res) => {
   const { username } = req.query;
 
   if (!username) {
-    return res.status(400).json({ message: "Username query parameter is required" });
+    return res
+      .status(400)
+      .json({ message: "Username query parameter is required" });
   }
 
   try {
-    const users = await User.find({ username: { $regex: username, $options: "i" } })
+    const users = await User.find({
+      username: { $regex: username, $options: "i" },
+    })
       .select("username fullName email")
       .limit(10); // Limit results to 10 users
 
@@ -101,6 +127,37 @@ export const searchUsers = async (req, res) => {
   }
 };
 
+export const searchUserForMessenger = async (req, res) => {
+  const { userId } = req.query;
+
+  // Check if userId is provided
+  if (!userId) {
+    return res
+      .status(400)
+      .json({ message: "User ID query parameter is required" });
+  }
+
+  // Check if userId is a valid ObjectId
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ message: "Invalid User ID" });
+  }
+
+  try {
+    // Find the user by their ID
+    const user = await User.findById(userId).select("username fullName email");
+
+    // If no user is found, return an empty array
+    if (!user) {
+      return res.status(200).json([]); // Ensure an empty array is returned
+    }
+
+    // Return the user in an array
+    res.status(200).json([user]); // This ensures the response is always an array
+  } catch (error) {
+    console.error("Search User for Messenger Error:", error);
+    res.status(500).json({ message: "Failed to search for user" });
+  }
+};
 
 // userController.js
 export const getProfile = async (req, res) => {
@@ -115,7 +172,6 @@ export const getProfile = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
-
 
 // Get another user's profile by ID
 export const getUserById = async (req, res) => {
