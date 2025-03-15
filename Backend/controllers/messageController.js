@@ -1,9 +1,7 @@
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import mongoose from "mongoose";
 import Message from "../models/Message.js";
 
-import { authenticateUser } from "../middlewares/userMiddleware.js";
+
 
 dotenv.config();
 
