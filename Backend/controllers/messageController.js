@@ -5,6 +5,9 @@ import Message from "../models/Message.js";
 
 dotenv.config();
 
+
+
+
 export const sendMessage = async (req, res) => {
   const { receiver, message } = req.body;
 

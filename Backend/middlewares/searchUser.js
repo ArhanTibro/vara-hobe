@@ -1,6 +1,6 @@
 import { verify } from "jsonwebtoken";
 import { findById } from "../models/User.js";
-import asyncHandler from "express-async-handler";
+
 
 export const protect = async (req, res, next) => {
   let token;

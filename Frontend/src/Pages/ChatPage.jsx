@@ -9,6 +9,80 @@ const ChatPage = () => {
   const [receiver, setReceiver] = useState(null);
   const [receiverName, setReceiverName] = useState("");
   const [recentContacts, setRecentContacts] = useState([]); // State for recent contacts
+  const [currentUser, setCurrentUser] = useState(null); // State for the currently logged-in user
+
+  // Hardcoded list of all users
+  const allUsers = [
+    {
+      _id: "67d584dba6c923696f32ad24",
+      username: "alamin",
+      fullName: "Al Amin",
+    },
+    {
+      _id: "67d58522a6c923696f32ad27",
+      username: "zihad",
+      fullName: "Zihad",
+    },
+    {
+      _id: "67d58552a6c923696f32ad2a",
+      username: "zisan",
+      fullName: "Zisan",
+    },
+    {
+      _id: "67d58585a6c923696f32ad2d",
+      username: "adel",
+      fullName: "Adel",
+    },
+    {
+      _id: "67d550a24349bfe6070b75dc",
+      username: "ifti123",
+      fullName: "Ifti Bin Islam",
+    },
+    {
+      _id: "67d58427a6c923696f32ad1e",
+      username: "dhruvo123",
+      fullName: "AR Dhruvo",
+    },
+    {
+      _id: "67d58483a6c923696f32ad21",
+      username: "hridoy123",
+      fullName: "AH Hridoy",
+    },
+    {
+      _id: "67d47fdbba1787452911912f",
+      username: "arhan123",
+      fullName: "Arhan Tibro",
+    },
+    {
+      _id: "67d48009ba17874529119132",
+      username: "nehal123",
+      fullName: "Nehal",
+    },
+  ];
+
+  // Fetch the currently logged-in user's details
+  const fetchCurrentUser = async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    try {
+      const response = await axios.get(
+        "http://localhost:4000/api/user/profile",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setCurrentUser(response.data.user); // Set the current user
+    } catch (error) {
+      console.error("Fetch Current User Error:", error);
+    }
+  };
+
+  // Filter out the current user from the recent contacts
+  const filterOutCurrentUser = (users) => {
+    if (!currentUser) return users; // If currentUser is not set, return all users
+    return users.filter((user) => user.username !== currentUser.username);
+  };
 
   // Fetch messages for the selected receiver
   const fetchMessages = async (receiverId) => {
@@ -54,24 +128,6 @@ const ChatPage = () => {
     }
   };
 
-  // Fetch recent contacts
-  const fetchRecentContacts = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
-
-    try {
-      const response = await axios.get(
-        "http://localhost:4000/api/chat/recent-contacts",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setRecentContacts(response.data); // Update recent contacts
-    } catch (error) {
-      console.error("Fetch Recent Contacts Error:", error);
-    }
-  };
-
   // Send a message to the receiver
   const sendMessage = async (message) => {
     const token = localStorage.getItem("accessToken");
@@ -87,21 +143,8 @@ const ChatPage = () => {
       );
       console.log("Message sent:", response.data); // Debugging
 
-      // Update recent contacts
-      const newContact = {
-        _id: receiver,
-        username: receiverName, // Assuming receiverName is already set
-      };
-
-      // Add the new contact to the top of the list (if not already present)
-      setRecentContacts((prevContacts) => {
-        const updatedContacts = prevContacts.filter(
-          (contact) => contact._id !== receiver
-        );
-        return [newContact, ...updatedContacts];
-      });
-
-      fetchMessages(receiver); // Refresh messages after sending
+      // Refresh messages after sending
+      fetchMessages(receiver);
     } catch (error) {
       console.error("Send Message Error:", error);
     }
@@ -115,10 +158,18 @@ const ChatPage = () => {
     }
   }, [receiver]);
 
-  // Fetch recent contacts when the component mounts
+  // Fetch the current user when the component mounts
   useEffect(() => {
-    fetchRecentContacts();
+    fetchCurrentUser();
   }, []);
+
+  // Set recent contacts (filter out the current user)
+  useEffect(() => {
+    if (currentUser) {
+      const filteredContacts = filterOutCurrentUser(allUsers);
+      setRecentContacts(filteredContacts);
+    }
+  }, [currentUser]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -126,7 +177,8 @@ const ChatPage = () => {
         {/* Contacts Panel (Left Side) */}
         <Contacts
           setReceiver={setReceiver}
-          recentContacts={recentContacts} // Pass recentContacts as a prop
+          recentContacts={recentContacts} // Pass filtered recent contacts
+          selectedReceiver={receiver} // Pass the selected receiver
         />
 
         {/* Chat Section (Right Side) */}
