@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom"; // Add useNavigate
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 const PropertyDetail = () => {
-  const { id } = useParams(); // Get the listing ID from the URL
-  const navigate = useNavigate(); // Use navigate for redirection
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [userRole, setUserRole] = useState(null); // State to store user role
+  const [userRole, setUserRole] = useState(null);
 
   // Fetch property details
   useEffect(() => {
@@ -58,7 +58,7 @@ const PropertyDetail = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-        setUserRole(response.data.role); // Set the user role
+        setUserRole(response.data.role);
       } catch (error) {
         console.error("Failed to fetch user role:", error);
       }
@@ -126,10 +126,8 @@ const PropertyDetail = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      console.log("Payment Response:", response.data); // Debugging output
-
       if (response.data.paymentUrl) {
-        window.location.href = response.data.paymentUrl; // Redirect to payment gateway
+        window.location.href = response.data.paymentUrl;
       } else {
         alert("Failed to retrieve payment URL.");
       }
@@ -149,7 +147,7 @@ const PropertyDetail = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert("Listing deleted successfully!");
-      navigate("/"); // Redirect to the Home page after deletion
+      navigate("/");
     } catch (error) {
       console.error("Delete Listing Error:", error);
       alert("Failed to delete listing. Please try again.");
@@ -180,7 +178,7 @@ const PropertyDetail = () => {
   const loggedInUserId = localStorage.getItem("userId");
   const isOwner = listing.seller?._id === loggedInUserId;
   const hasAccess = listing.access === loggedInUserId;
-  const isAdmin = userRole === "admin"; // Check if the user is an admin
+  const isAdmin = userRole === "admin";
 
   return (
     <div className="container mx-auto p-4">
@@ -218,6 +216,20 @@ const PropertyDetail = () => {
               className="w-full h-96 object-cover"
             />
           )}
+
+          {/* Seller Information (Owner) */}
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <h3 className="text-xl font-semibold mb-2 text-gray-800">Owner</h3>
+            <p className="text-gray-700">
+              <strong>Name:</strong> {listing.seller?.fullName}
+            </p>
+            <p className="text-gray-700">
+              <strong>Phone:</strong> {listing.seller?.phoneNumber}
+            </p>
+            <p className="text-gray-700">
+              <strong>Address:</strong> {listing.seller?.presentAddress}
+            </p>
+          </div>
         </div>
 
         {/* Right: Property Details */}
@@ -252,9 +264,6 @@ const PropertyDetail = () => {
             </p>
             <p>
               <strong>Description:</strong> {listing.description}
-            </p>
-            <p>
-              <strong>Seller:</strong> {listing.seller?.fullName}
             </p>
           </div>
 
