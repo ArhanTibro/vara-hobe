@@ -13,18 +13,19 @@ const ChatBox = ({ messages, sendMessage }) => {
   return (
     <div className="flex-1 p-4">
       <div className="h-[80vh] overflow-y-auto mb-4">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`p-2 my-2 rounded ${
-              msg.sender === localStorage.getItem("userId")
-                ? "bg-blue-500 text-white ml-auto w-3/4"
-                : "bg-gray-200 mr-auto w-3/4"
-            }`}
-          >
-            {msg.message}
-          </div>
-        ))}
+        {Array.isArray(messages) &&
+          messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`p-2 my-2 rounded ${
+                msg.sender === localStorage.getItem("userId")
+                  ? "bg-blue-500 text-white ml-auto w-3/4"
+                  : "bg-gray-200 mr-auto w-3/4"
+              }`}
+            >
+              {msg.message}
+            </div>
+          ))}
       </div>
       <div className="flex">
         <input

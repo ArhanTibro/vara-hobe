@@ -5,39 +5,12 @@ const Contacts = ({ setReceiver }) => {
   const [users, setUsers] = useState([]); // Initialize as an empty array
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const [searchResults, setSearchResults] = useState([]); // State for search results
-
-  // Fetch all users for the contacts list
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get("/user/searchUserForMessenger", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        console.log("API Response:", response.data); // Debugging
-
-        // Ensure the response is an array
-        if (Array.isArray(response.data)) {
-          setUsers(response.data);
-        } else {
-          console.error("Invalid response format:", response.data);
-          setUsers([]); // Set to empty array if response is not an array
-        }
-      } catch (error) {
-        console.error("Fetch Users Error:", error);
-        setUsers([]); // Set to empty array on error
-      }
-    };
-    fetchUsers();
-  }, []);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handle search input change
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
-
-  const [isLoading, setIsLoading] = useState(false);
 
   // For search
   useEffect(() => {
@@ -47,15 +20,17 @@ const Contacts = ({ setReceiver }) => {
         return;
       }
 
+      const token = localStorage.getItem("accessToken");
+      if (!token || !searchQuery.trim()) return;
+
       setIsLoading(true); // Start loading
       try {
-        const response = await axios.get("/user/searchUserForMessenger", {
-          params: { username: searchQuery },
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        console.log("Search Results:", response.data);
+        const response = await axios.get(
+          `http://localhost:4000/api/user/search?username=${searchQuery}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         if (Array.isArray(response.data)) {
           setSearchResults(response.data);
@@ -101,7 +76,10 @@ const Contacts = ({ setReceiver }) => {
                 <li
                   key={user._id}
                   className="cursor-pointer hover:bg-gray-200 p-2 rounded"
-                  onClick={() => setReceiver(user._id)}
+                  onClick={() => {
+                    console.log("Setting receiver:", user._id); // Debugging
+                    setReceiver(user._id);
+                  }}
                 >
                   {user.username}
                 </li>
@@ -119,7 +97,10 @@ const Contacts = ({ setReceiver }) => {
             <li
               key={user._id}
               className="cursor-pointer hover:bg-gray-200 p-2 rounded"
-              onClick={() => setReceiver(user._id)}
+              onClick={() => {
+                console.log("Setting receiver:", user._id); // Debugging
+                setReceiver(user._id);
+              }}
             >
               {user.username}
             </li>

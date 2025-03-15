@@ -8,16 +8,14 @@ const ChatPage = () => {
   const [messages, setMessages] = useState([]);
   const [receiver, setReceiver] = useState(null);
 
-  console.log("ChatPage Initialized");
-
   const fetchMessages = async (receiverId) => {
+    const token = localStorage.getItem("accessToken");
+    if (!token || !receiver.trim()) return;
     try {
       const response = await axios.get(
-        `/chat/messages?receiver=${receiverId}`,
+        `http://localhost:4000/api/chat/messages?receiver=${receiver}`,
         {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       setMessages(response.data);
@@ -27,14 +25,13 @@ const ChatPage = () => {
   };
 
   const sendMessage = async (message) => {
+    const token = localStorage.getItem("accessToken");
+    if (!token || !receiver.trim()) return;
     try {
-      await axios.post(
-        "/chat/send",
-        { receiver, message },
+      const response = await axios.post(
+        `http://localhost:4000/api/chat/send?receiver=${receiver}`,
         {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       fetchMessages(receiver); // Refresh messages after sending

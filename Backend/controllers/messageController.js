@@ -1,11 +1,13 @@
-import express from "express";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import Message from "../models/Message.js";
+
 import { authenticateUser } from "../middlewares/userMiddleware.js";
-import { messages, sendMessage } from "../controllers/messageController.js";
 
-const chatRouter = express.Router();
+dotenv.config();
 
-// Send a message
-/* chatRouter.post("/send", authenticateUser, async (req, res) => {
+export const sendMessage = async (req, res) => {
   const { receiver, message } = req.body;
 
   if (!receiver || !message) {
@@ -29,10 +31,10 @@ const chatRouter = express.Router();
     console.error("Send Message Error:", error);
     res.status(500).json({ message: "Server Error" });
   }
-});
+};
 
 // Fetch messages between two users
-chatRouter.get("/messages", authenticateUser, async (req, res) => {
+export const messages = async (req, res) => {
   const { receiver } = req.query;
 
   if (!receiver) {
@@ -52,9 +54,4 @@ chatRouter.get("/messages", authenticateUser, async (req, res) => {
     console.error("Fetch Messages Error:", error);
     res.status(500).json({ message: "Server Error" });
   }
-}); */
-
-chatRouter.get("/messages", authenticateUser, messages);
-chatRouter.post("/send", authenticateUser, sendMessage);
-
-export default chatRouter;
+};
