@@ -43,6 +43,7 @@ const OtherUserProfile = () => {
     };
 
     fetchOtherUserProfile();
+    window.scrollTo(0, 0);
   }, [userId, navigate]);
 
   // Handle rating submission

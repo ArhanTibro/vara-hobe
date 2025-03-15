@@ -118,6 +118,7 @@ const ChatPage = () => {
   // Fetch recent contacts when the component mounts
   useEffect(() => {
     fetchRecentContacts();
+    window.scrollTo(0, 0);
   }, []);
 
   return (
