@@ -177,7 +177,7 @@ const List = () => {
           </div>
         </div>
       </div>
-      <br />
+
       {/* Listings Section */}
       <h2 className="text-3xl font-bold text-center mb-8 text-blue-600">
         Available Listings

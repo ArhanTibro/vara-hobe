@@ -30,7 +30,7 @@ const LoginPage = () => {
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("userId", data.user.id); // Store user ID
 
-      //alert("Login Successful");
+      alert("Login Successful");
       navigate("/"); // Redirect to homepage
     } catch (err) {
       setError(err.message);

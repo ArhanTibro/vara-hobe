@@ -4,7 +4,6 @@ import axios from "axios";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Footer from "../Components/Footer";
 
 const PropertyDetail = () => {
   const { id } = useParams();
@@ -43,7 +42,6 @@ const PropertyDetail = () => {
       }
     };
 
-    window.scrollTo(0, 0);
     fetchListing();
   }, [id]);
 
@@ -351,7 +349,6 @@ const PropertyDetail = () => {
           )}
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

@@ -41,7 +41,7 @@ const ProfilePage = () => {
         navigate("/login");
       }
     };
-    window.scrollTo(0, 0);
+
     fetchUserData();
   }, [navigate]);
 

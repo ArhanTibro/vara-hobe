@@ -1,15 +1,10 @@
 import bg from "../assets/bg.webp";
-import { useEffect } from "react";
 import FloatingMessenger from "../Components/FloatingMessenger";
 import Footer from "../Components/Footer";
 import List from "../Components/List";
 //import SearchBox from "../Components/SearchBox";
 
 const Home = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <div className="flex flex-col min-h-screen">
       {/* Background Section */}
@@ -34,6 +29,7 @@ const Home = () => {
           </div>
         </div>
       </div>
+
       {/* Search Box */}
 
       <List />

@@ -129,7 +129,7 @@ const MyList = () => {
                     <strong>Size:</strong> {listing.size} sqft
                   </p>
                   <p className="text-xl font-bold text-blue-600">
-                    à§³{listing.rent} / month
+                    ৳{listing.rent} / month
                   </p>
                 </div>
                 <button

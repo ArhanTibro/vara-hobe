@@ -25,10 +25,6 @@ userRouter.get("/search", authenticateUser, searchUsers); // Search users by use
 userRouter.get("/searchForMessenger", authenticateUser, searchUserForMessenger);
 userRouter.get("/profile", authenticateUser, getProfile); // Get logged-in user's profile
 userRouter.get("/:userId", authenticateUser, getUserById); // Get another user's profile by ID
-userRouter.post("/:userId/rate", rateUser); // Rate another user
-
-//listing routes
-//userRouter.get("/list/user", authenticateUser, getMyListings);
-//userRouter.get("/list/:userId", authenticateUser, getUserListings);
+userRouter.post("/:userId/rate",  rateUser); // Rate another user
 
 export default userRouter;
