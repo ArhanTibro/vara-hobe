@@ -21,7 +21,7 @@ const FloatingMessenger = () => {
       const result = await axios.post(
         `http://localhost:4000/api/deepai/prompt/`, // Use the proxy endpoint
         {
-          prompt: `Try to give the right size in squre feet and right amount of bedroom, bathrooms and balcony count for the following scenario. 
+          prompt: `Try to give the right size in square feet and right amount of bedroom, bathrooms and balcony count for the following scenario. 
           Do not bold or use markdown formatting. Text: ${userInput}`,
         }
       );
@@ -41,17 +41,23 @@ const FloatingMessenger = () => {
 
   return (
     <div>
-      {/* Floating Button */}
-      <button
-        onClick={togglePrompt}
-        className="fixed bottom-8 right-8 bg-blue-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:bg-blue-600 transition-colors"
-      >
-        <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThr7qrIazsvZwJuw-uZCtLzIjaAyVW_ZrlEQ&s" // Replace with your image URL
-          alt="Chat Icon"
-          className="w-8 h-8" // Adjust the size of the image
-        />
-      </button>
+      {/* Floating Button with Tooltip */}
+      <div className="fixed bottom-8 right-8 group">
+        <button
+          onClick={togglePrompt}
+          className="bg-blue-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg hover:bg-blue-600 transition-colors"
+        >
+          <img
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThr7qrIazsvZwJuw-uZCtLzIjaAyVW_ZrlEQ&s" // Replace with your image URL
+            alt="Chat Icon"
+            className="w-8 h-8" // Adjust the size of the image
+          />
+        </button>
+        {/* Tooltip */}
+        <div className="absolute bottom-20 right-0 bg-black text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+          AI Help
+        </div>
+      </div>
 
       {/* Prompt Window */}
       {isOpen && (
